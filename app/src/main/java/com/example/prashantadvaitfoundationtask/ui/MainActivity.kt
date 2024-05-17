@@ -2,15 +2,14 @@ package com.example.prashantadvaitfoundationtask.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.AbsListView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.prashantadvaitfoundationtask.databinding.ActivityMainBinding
-import com.example.prashantadvaitfoundationtask.ui.adapter.GridAdapter
 import com.example.prashantadvaitfoundationtask.ui.adapter.ImageAdapter
-import com.example.prashantadvaitfoundationtask.utils.CONSTANTS
+import com.example.prashantadvaitfoundationtask.utils.Constants
 import com.example.prashantadvaitfoundationtask.utils.Status
 import com.example.prashantadvaitfoundationtask.utils.viewBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,47 +19,29 @@ import timber.log.Timber
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
+
     private val binding by viewBinding(ActivityMainBinding::inflate)
     val mainViewModel : MainViewModel by viewModels()
-    private lateinit var gridAdapter: GridAdapter
-    private val itemsPerPage = 10
-    private val totalItems = 99
-    private var currentPage = 0
-    private var listOfUrls = emptyList<String>()
+    private lateinit var gridAdapter: ImageAdapter
+    private var responseList = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         mainViewModel.fetchMainData()
         observeData()
-
     }
 
 
 
     private fun initUi() {
         val recyclerView = binding.gridView
-        recyclerView.numColumns = CONSTANTS.GRID_COLUMNS
-        gridAdapter = GridAdapter(this)
+        recyclerView.isVerticalScrollBarEnabled = true
+        val layoutManager = GridLayoutManager(this, Constants.GRID_COLUMNS)
+        recyclerView.layoutManager = layoutManager
+        gridAdapter = ImageAdapter()
         recyclerView.adapter = gridAdapter
-        binding.gridView.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
-
-            }
-
-            override fun onScroll(
-                view: AbsListView?,
-                firstVisibleItem: Int,
-                visibleItemCount: Int,
-                totalItemCount: Int,
-            ) {
-                val lastItem = firstVisibleItem + visibleItemCount
-                if (lastItem == totalItemCount && totalItemCount < totalItems) {
-                    currentPage++
-                    gridAdapter.submitList(getItemsForPage(currentPage, listOfUrls))
-                }
-            }
-
-        })
+        gridAdapter.addImageUrls(responseList)
     }
 
     private fun observeData() {
@@ -79,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
                         it.data?.let { mainResponseList ->
                             val list: MutableList<String> = mainResponseList.map { res -> res.getThumbnailUrl() }.toMutableList()
-                            listOfUrls = list
+                            responseList = list
                             Timber.i("Received list.")
                             initUi()
                         }
@@ -103,13 +84,4 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getItemsForPage(page: Int, listOfUrls: List<String>): List<String> {
-        val start = (page - 1) * itemsPerPage
-        val end = minOf(start + itemsPerPage, totalItems)
-        val items = mutableListOf<String>()
-        for (i in start until end) {
-            items.add(listOfUrls[i])
-        }
-        return items
-    }
 }

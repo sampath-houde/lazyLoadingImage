@@ -80,6 +80,9 @@ dependencies {
     //Logging Http Request
     implementation(libs.logging.interceptor)
 
+    // Disk LRU Cache
+    implementation libs.disklrucache
+
 }
 
 kapt {

@@ -2,8 +2,7 @@ package com.example.prashantadvaitfoundationtask.di
 
 
 import com.example.prashantadvaitfoundationtask.api.ApiServices
-import com.example.prashantadvaitfoundationtask.utils.CONSTANTS
-import com.google.gson.Gson
+import com.example.prashantadvaitfoundationtask.utils.Constants
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,7 +31,7 @@ class Module {
 
     @Provides
     fun provideBaseUrl(): String {
-        return CONSTANTS.BASE_URL
+        return Constants.BASE_URL
     }
 
     @Singleton
