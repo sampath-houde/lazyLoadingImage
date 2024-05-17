@@ -1,5 +1,6 @@
 package com.example.prashantadvaitfoundationtask.utils
 
 object CONSTANTS {
-    val baseUrl = "https://acharyaprashant.org/"
+    val BASE_URL = "https://acharyaprashant.org/"
+    val GRID_COLUMNS = 3
 }
