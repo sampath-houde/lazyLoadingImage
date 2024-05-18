@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
-    val mainViewModel : MainViewModel by viewModels()
+    private val mainViewModel : MainViewModel by viewModels()
     private lateinit var gridAdapter: ImageAdapter
     private var responseList = mutableListOf<String>()
 
@@ -34,13 +34,13 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun initUi() {
-        val recyclerView = binding.gridView
-        recyclerView.isVerticalScrollBarEnabled = true
-        val layoutManager = GridLayoutManager(this, Constants.GRID_COLUMNS)
-        recyclerView.layoutManager = layoutManager
+    private fun initRecyclerView() {
         gridAdapter = ImageAdapter()
-        recyclerView.adapter = gridAdapter
+        binding.gridView.apply {
+            isVerticalScrollBarEnabled = true
+            layoutManager = GridLayoutManager(this@MainActivity, Constants.GRID_COLUMNS)
+            adapter = gridAdapter
+        }
         gridAdapter.addImageUrls(responseList)
     }
 
@@ -51,7 +51,6 @@ class MainActivity : AppCompatActivity() {
                     Status.LOADING -> {
                         binding.progressBar.visibility = View.VISIBLE
                         binding.gridView.visibility = View.GONE
-
                         Timber.i("Loading...")
                     }
                     Status.SUCCESS -> {
@@ -62,7 +61,7 @@ class MainActivity : AppCompatActivity() {
                             val list: MutableList<String> = mainResponseList.map { res -> res.getThumbnailUrl() }.toMutableList()
                             responseList = list
                             Timber.i("Received list.")
-                            initUi()
+                            initRecyclerView()
                         }
                             ?: run {
 

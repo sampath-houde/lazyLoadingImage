@@ -34,8 +34,7 @@ class MainViewModel @Inject constructor(
 
             repository.fetchMainData()
                 .catch {
-                    mainState.value =
-                        ViewState.error(it.message.toString())
+                    mainState.value = ViewState.error(it.message.toString())
                 }
                 .collect {
                     mainState.value = ViewState.success(it.data)
