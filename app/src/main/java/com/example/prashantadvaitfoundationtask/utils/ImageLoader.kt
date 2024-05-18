@@ -1,7 +1,6 @@
 package com.example.prashantadvaitfoundationtask.utils
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -11,8 +10,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
 
 object ImageLoader {
 
@@ -33,21 +30,21 @@ object ImageLoader {
         val cachedBitmap = getBitmapFromMemCache(url) ?: DiskCacheUtils.getBitmapFromDiskCache(url)
         if (cachedBitmap != null) {
             CoroutineScope(Dispatchers.Main).launch {
-                imageView.setImageBitmap(cachedBitmap.scaleDown(Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT))
+                imageView.setImageBitmap(cachedBitmap)
                 progressBar.visibility = View.GONE
             }
 
         } else {
             imageView.tag = url
             val job = CoroutineScope(Dispatchers.IO).launch {
-                val bitmap = downloadBitmap(url)
+                val bitmap = BitmapUtils.decodeSampledBitmapFromUrl(url, Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT)
                     if (imageView.tag == url && bitmap != null) {
                         withContext(Dispatchers.Main) {
                             imageView.setImageBitmap(bitmap)
                             progressBar.visibility = View.GONE
                         }
                         CoroutineScope(Dispatchers.IO).launch {
-                            addBitmapToMemoryCache(url, bitmap.scaleDown(Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT), position)
+                            addBitmapToMemoryCache(url, bitmap, position)
                             DiskCacheUtils.putBitmapToDiskCache(url, bitmap)
                         }
                     }
@@ -69,20 +66,5 @@ object ImageLoader {
             memCacheLog.add(Triple("Position", "$position", key))
             memoryCache.put(key, bitmap)
         }
-    }
-
-    private fun downloadBitmap(url: String): Bitmap? {
-        var bitmap: Bitmap? = null
-        try {
-            val conn = URL(url).openConnection() as HttpURLConnection
-            conn.connect()
-            val inputStream = conn.inputStream
-            bitmap = BitmapFactory.decodeStream(inputStream)
-            inputStream.close()
-            conn.disconnect()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return bitmap
     }
 }

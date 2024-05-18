@@ -3,6 +3,8 @@ package com.example.prashantadvaitfoundationtask.utils
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.example.prashantadvaitfoundationtask.utils.Constants.DISK_CACHE_SIZE
+import com.example.prashantadvaitfoundationtask.utils.Constants.DISK_CACHE_SUBDIR
 import com.jakewharton.disklrucache.DiskLruCache
 import java.io.File
 import java.io.IOException
@@ -12,8 +14,8 @@ import java.security.NoSuchAlgorithmException
 
 object DiskCacheUtils {
 
-    private const val DISK_CACHE_SIZE = 1024 * 1024 * 50 // 50MB
-    private const val DISK_CACHE_SUBDIR = "thumbnails"
+
+
     private var diskLruCache: DiskLruCache? = null
 
     fun init(context: Context) {
