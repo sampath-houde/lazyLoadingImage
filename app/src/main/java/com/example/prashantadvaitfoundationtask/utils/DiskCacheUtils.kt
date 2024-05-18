@@ -19,21 +19,21 @@ object DiskCacheUtils {
     private var diskLruCache: DiskLruCache? = null
 
     fun init(context: Context) {
-        val cacheDir = getDiskCacheDir(context, DISK_CACHE_SUBDIR)
+        val cacheDir = getDiskCacheDir(context)
         if (!cacheDir.exists()) {
             cacheDir.mkdirs()
         }
         diskLruCache = DiskLruCache.open(cacheDir, 1, 1, DISK_CACHE_SIZE.toLong())
     }
 
-    private fun getDiskCacheDir(context: Context, uniqueName: String): File {
+    private fun getDiskCacheDir(context: Context): File {
         val cachePath =
             if (context.externalCacheDir != null && context.externalCacheDir?.canWrite()!!) {
                 context.externalCacheDir?.path
             } else {
                 context.cacheDir.path
             }
-        return File(cachePath + File.separator + uniqueName)
+        return File(cachePath + File.separator + DISK_CACHE_SUBDIR)
     }
 
     fun putBitmapToDiskCache(key: String, bitmap: Bitmap) {
